@@ -3,22 +3,22 @@ package Win32::API::Interface;
 use strict;
 
 use vars qw/$VERSION/;
-$VERSION = '0.0001';
+$VERSION = '0.0001_01';
 
 use Win32::API ();
 
 =head1 NAME
 
-  Win32::API::Interface - Provide OO interface for Win32::API functions
+  Win32::API::Interface - Object oriented interface generation
 
 =head1 SYNOPSIS
 
-	
+
 	package MyModule;
 	use base qw/Win32::API::Interface/;
 
-	__PACKAGE__->provide( "kernel32", "GetCurrentProcessId", "", "I" );
-	__PACKAGE__->provide( "kernel32", "GetCurrentProcessId", "", "I", 'get_pid' );
+	__PACKAGE__->generate( "kernel32", "GetCurrentProcessId", "", "N" );
+	__PACKAGE__->generate( "kernel32", "GetCurrentProcessId", "", "N", 'get_pid' );
 
 	1;
 
@@ -27,13 +27,21 @@ use Win32::API ();
 	print "PID: " . $obj->get_pid . "\n";
 
 
-=head1 DESCRIPTION                            
+=head1 DESCRIPTION
 
-B<!!! This module is still experimental. Do not rely on the interface. !!!>
+This module provides functions for generating a object oriented interface to
+Win32 API functions.
 
 =head1 METHODS
 
 =head2 new
+
+    my $obj = Module->new;
+
+
+Win32::API::Interface provides a basic constructor. It generates a
+hash-based object and can be called as either a class method or an object
+method.
 
 =cut
 
@@ -44,21 +52,54 @@ sub new {
     return bless {}, $class;
 }
 
-=head2 provide
+=head2 generate
 
-    Class->provide( ... )
+    __PACKAGE__->generate( "kernel32", "GetCurrentProcessId", "", "N" );
+
+This generates a method called I<GetCurrentProcessId> which is exported
+by I<kernel32.dll>. It does not take any input parameters but returns a value
+of type I<long>.
+
+    __PACKAGE__->generate( "kernel32", "GetCurrentProcessId", "", "N", "get_pid" );
+
+Actually the same as above, but this will generate a method called I<get_pid>.
+This is useful if you do not want to rely on the API function name.
+
+    __PACKAGE__->generate(
+        [ "kernel32", "GetTempPath", "NP", "N" ],
+        [ "kernel32", "GetCurrentProcessId", "", "N", "get_pid" ],
+    );
+
+You may call I<generate> passing an array of array references.
+
+    __PACKAGE__->generate( {
+        "kernel32" => [
+            [ "GetTempPath", "NP", "N" ],
+            [ "GetCurrentProcessId", "", "N", "get_pid" ],
+        ],
+        "user32" => [
+            [ "GetCursorPos", "P", "I"]
+        ],
+    } );
 
 =cut
 
 {
     no strict 'refs';
 
-    sub provide {
+    sub generate {
         my $self = shift;
 
         if ( 'ARRAY' eq ref $_[0] ) {
-            foreach my $args ( @_ ) {
-                $self->provide( @{$args} );
+            foreach my $args (@_) {
+                $self->generate( @{$args} );
+            }
+        }
+        elsif ( 'HASH' eq ref $_[0] ) {
+            while ( my ( $library, $params ) = each %{ $_[0] } ) {
+                foreach my $args ( @{$params} ) {
+                    $self->generate( $library, @{$args} );
+                }
             }
         }
         else {
@@ -68,7 +109,7 @@ sub new {
             $alias ||= $name;
 
             *{"${class}::$alias"} =
-              $self->_provide( $library, $name, $params, $retr )
+              $self->_generate( $library, $name, $params, $retr )
               unless defined &{"${class}::$alias"};
         }
 
@@ -76,7 +117,7 @@ sub new {
     }
 }
 
-sub _provide {
+sub _generate {
     my ( $class, $library, $name, $params, $retr ) = @_;
 
     my $key = uc "$library-$name";
@@ -92,19 +133,13 @@ sub _provide {
     };
 }
 
-=head2 provide_ex
-
-    Class->provide_ex( ... )
-
-=cut                 
-
-sub provide_ex {
+sub generate_ex {
     my $self = shift;
-    my %args = @_ % 2 == 0 ? @_ : %{ $_[0] };
+    my %args = 'HASH' eq ref $_[0] ? %{ $_[0] } : @_;
 
     while ( my ( $library, $params ) = each %args ) {
         foreach my $args ( @{$params} ) {
-            $self->provide( $library, @{$args} );
+            $self->generate( $library, @{$args} );
         }
     }
 

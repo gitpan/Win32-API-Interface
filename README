@@ -1,12 +1,12 @@
 NAME
-      Win32::API::Interface - Provide OO interface for Win32::API functions
+      Win32::API::Interface - Object oriented interface generation
 
 SYNOPSIS
             package MyModule;
             use base qw/Win32::API::Interface/;
 
-            __PACKAGE__->provide( "kernel32", "GetCurrentProcessId", "", "I" );
-            __PACKAGE__->provide( "kernel32", "GetCurrentProcessId", "", "I", 'get_pid' );
+            __PACKAGE__->generate( "kernel32", "GetCurrentProcessId", "", "N" );
+            __PACKAGE__->generate( "kernel32", "GetCurrentProcessId", "", "N", 'get_pid' );
 
             1;
 
@@ -15,15 +15,46 @@ SYNOPSIS
             print "PID: " . $obj->get_pid . "\n";
 
 DESCRIPTION
-    !!! This module is still experimental. Do not rely on the interface. !!!
+    This module provides functions for generating a object oriented
+    interface to Win32 API functions.
 
 METHODS
   new
-  provide
-        Class->provide( ... )
+        my $obj = Module->new;
 
-  provide_ex
-        Class->provide_ex( ... )
+    Win32::API::Interface provides a basic constructor. It generates a
+    hash-based object and can be called as either a class method or an
+    object method.
+
+  generate
+        __PACKAGE__->generate( "kernel32", "GetCurrentProcessId", "", "N" );
+
+    This generates a method called *GetCurrentProcessId* which is exported
+    by *kernel32.dll*. It does not take any input parameters but returns a
+    value of type *long*.
+
+        __PACKAGE__->generate( "kernel32", "GetCurrentProcessId", "", "N", "get_pid" );
+
+    Actually the same as above, but this will generate a method called
+    *get_pid*. This is useful if you do not want to rely on the API function
+    name.
+
+        __PACKAGE__->generate(
+            [ "kernel32", "GetTempPath", "NP", "N" ],
+            [ "kernel32", "GetCurrentProcessId", "", "N", "get_pid" ],
+        );
+
+    You may call *generate* passing an array of array references.
+
+        __PACKAGE__->generate( {
+            "kernel32" => [
+                [ "GetTempPath", "NP", "N" ],
+                [ "GetCurrentProcessId", "", "N", "get_pid" ],
+            ],
+            "user32" => [
+                [ "GetCursorPos", "P", "I"]
+            ],
+        } );
 
 AUTHOR
     Sascha Kiefer, esskar@cpan.org
