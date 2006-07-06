@@ -2,8 +2,9 @@ package Win32::API::Interface;
 
 use strict;
 
-use vars qw/$VERSION/;
-$VERSION = '0.0001_01';
+use vars qw/$VERSION $INSTANCE/;
+$VERSION  = '0.0001_02';
+$INSTANCE = Win32::API::Interface->new;
 
 use Win32::API ();
 
@@ -125,9 +126,12 @@ sub _generate {
     return sub {
         my $self = shift;
 
+        $self = $Win32::API::Interface::INSTANCE unless ref $self;
+
         my $api = defined $self->{$key} ? $self->{$key} : $self->{$key} =
           Win32::API->new( $library, $name, $params, $retr );
-        die "Unable to import API $name from $library: $^E" unless defined $api;
+        die "Unable to import API $name from $library: $^E"
+          unless defined $api;
 
         return $api->Call(@_);
     };

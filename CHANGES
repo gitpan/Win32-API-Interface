@@ -1,5 +1,8 @@
 Revision history for Perl extension Win32::API::Interface
 
+0.0001_02 Thu Jul 07 00:49:01 2006
+    - make methods also class methods
+
 0.0001_01 Thu Jul 06 22:15:28 2006
     - interface changed
     - pod added
