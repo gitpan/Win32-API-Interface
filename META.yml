@@ -1,0 +1,19 @@
+---
+name: Win32-API-Interface
+version: 0.0001
+author:
+  - 'Sascha Kiefer, L<esskar@cpan.org>'
+abstract: Win32::API::Interface
+license: perl
+requires:
+  Win32::API: 0.41
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Win32::API::Interface:
+    file: lib/Win32/API/Interface.pm
+    version: 0.0001
+resources:
+  license: http://dev.perl.org/licenses/

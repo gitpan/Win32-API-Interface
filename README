@@ -1,0 +1,36 @@
+NAME
+      Win32::API::Interface - Provide OO interface for Win32::API functions
+
+SYNOPSIS
+            package MyModule;
+            use base qw/Win32::API::Interface/;
+
+            __PACKAGE__->provide( "kernel32", "GetCurrentProcessId", "", "I" );
+            __PACKAGE__->provide( "kernel32", "GetCurrentProcessId", "", "I", 'get_pid' );
+
+            1;
+
+            my $obj = MyModule->new );
+            print "PID: " . $obj->GetCurrentProcessId . "\n";
+            print "PID: " . $obj->get_pid . "\n";
+
+DESCRIPTION
+    !!! This module is still experimental. Do not rely on the interface. !!!
+
+METHODS
+  new
+  provide
+        Class->provide( ... )
+
+  provide_ex
+        Class->provide_ex( ... )
+
+AUTHOR
+    Sascha Kiefer, esskar@cpan.org
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 Sascha Kiefer
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
