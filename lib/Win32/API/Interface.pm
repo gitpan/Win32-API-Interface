@@ -2,8 +2,8 @@ package Win32::API::Interface;
 
 use strict;
 
-use vars qw/$VERSION $INSTANCE/;
-$VERSION  = '0.0001_02';
+use vars qw/$VERSION $INSTANCE %API_GENERATED/;
+$VERSION  = '0.0001_03';
 $INSTANCE = Win32::API::Interface->new;
 
 use Win32::API ();
@@ -14,8 +14,7 @@ use Win32::API ();
 
 =head1 SYNOPSIS
 
-
-	package MyModule;
+    package MyModule;
 	use base qw/Win32::API::Interface/;
 
 	__PACKAGE__->generate( "kernel32", "GetCurrentProcessId", "", "N" );
@@ -26,7 +25,6 @@ use Win32::API ();
 	my $obj = MyModule->new );
 	print "PID: " . $obj->GetCurrentProcessId . "\n";
 	print "PID: " . $obj->get_pid . "\n";
-
 
 =head1 DESCRIPTION
 
@@ -39,7 +37,6 @@ Win32 API functions.
 
     my $obj = Module->new;
 
-
 Win32::API::Interface provides a basic constructor. It generates a
 hash-based object and can be called as either a class method or an object
 method.
@@ -51,6 +48,12 @@ sub new {
     my $class = ref $proto || $proto;
 
     return bless {}, $class;
+}
+
+sub self {
+    my $self = shift;
+    $self = $Win32::API::Interface::INSTANCE unless ref $self;
+    return $self;
 }
 
 =head2 generate
@@ -122,13 +125,17 @@ sub _generate {
     my ( $class, $library, $name, $params, $retr ) = @_;
 
     my $key = uc "$library-$name";
+    $API_GENERATED{$name} = 1;
 
     return sub {
-        my $self = shift;
+        my $self = shift->self;
 
-        $self = $Win32::API::Interface::INSTANCE unless ref $self;
+        $self->{api} ||= {};
 
-        my $api = defined $self->{$key} ? $self->{$key} : $self->{$key} =
+        my $api =
+          defined $self->{api}->{$key}
+          ? $self->{api}->{$key}
+          : $self->{api}->{$key} =
           Win32::API->new( $library, $name, $params, $retr );
         die "Unable to import API $name from $library: $^E"
           unless defined $api;
@@ -148,6 +155,18 @@ sub generate_ex {
     }
 
     return 1;
+}
+
+=head2 generated
+
+Returns a list of all real generated API function names
+
+    __PACKAGE__->generated( );
+
+=cut
+
+sub generated {
+    return keys %API_GENERATED;
 }
 
 =head1 AUTHOR

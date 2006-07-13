@@ -2,7 +2,7 @@ NAME
       Win32::API::Interface - Object oriented interface generation
 
 SYNOPSIS
-            package MyModule;
+        package MyModule;
             use base qw/Win32::API::Interface/;
 
             __PACKAGE__->generate( "kernel32", "GetCurrentProcessId", "", "N" );
@@ -55,6 +55,11 @@ METHODS
                 [ "GetCursorPos", "P", "I"]
             ],
         } );
+
+  generated
+    Returns a list of all real generated API function names
+
+        __PACKAGE__->generated( );
 
 AUTHOR
     Sascha Kiefer, esskar@cpan.org

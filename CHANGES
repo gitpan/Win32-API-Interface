@@ -1,5 +1,9 @@
 Revision history for Perl extension Win32::API::Interface
 
+0.0001_03 Thu Jul 07 00:49:01 2006
+    - internal changes
+    - function generated added
+
 0.0001_02 Thu Jul 07 00:49:01 2006
     - make methods also class methods
 
