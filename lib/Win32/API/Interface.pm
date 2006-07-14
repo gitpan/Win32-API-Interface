@@ -3,7 +3,7 @@ package Win32::API::Interface;
 use strict;
 
 use vars qw/$VERSION $INSTANCE %API_GENERATED/;
-$VERSION  = '0.0001_05';
+$VERSION  = '0.01';
 $INSTANCE = Win32::API::Interface->new;
 
 use Win32::API ();
