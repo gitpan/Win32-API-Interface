@@ -3,7 +3,7 @@ package Win32::API::Interface;
 use strict;
 
 use vars qw/$VERSION $INSTANCE %API_GENERATED/;
-$VERSION  = '0.0001_04';
+$VERSION  = '0.0001_05';
 $INSTANCE = Win32::API::Interface->new;
 
 use Win32::API ();
@@ -140,10 +140,10 @@ sub _generate {
         die "Unable to import API $name from $library: $^E"
           unless defined $api;
 
-        $call = sub { return $api->Call(@_) }
+        $call = sub { return shift->Call(@_) }
           unless ( 'CODE' eq ref $call );
 
-        return $call->(@_);
+        return $call->($api, @_);
     };
 }
 
