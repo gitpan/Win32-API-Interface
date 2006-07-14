@@ -3,7 +3,7 @@ package Win32::API::Interface;
 use strict;
 
 use vars qw/$VERSION $INSTANCE %API_GENERATED/;
-$VERSION  = '0.0001_03';
+$VERSION  = '0.0001_04';
 $INSTANCE = Win32::API::Interface->new;
 
 use Win32::API ();
@@ -108,12 +108,12 @@ You may call I<generate> passing an array of array references.
         }
         else {
 
-            my ( $library, $name, $params, $retr, $alias ) = @_;
+            my ( $library, $name, $params, $retr, $alias, $call ) = @_;
             my $class = ref $self || $self;
             $alias ||= $name;
 
             *{"${class}::$alias"} =
-              $self->_generate( $library, $name, $params, $retr )
+              $self->_generate( $library, $name, $params, $retr, $call )
               unless defined &{"${class}::$alias"};
         }
 
@@ -122,7 +122,7 @@ You may call I<generate> passing an array of array references.
 }
 
 sub _generate {
-    my ( $class, $library, $name, $params, $retr ) = @_;
+    my ( $class, $library, $name, $params, $retr, $call ) = @_;
 
     my $key = uc "$library-$name";
     $API_GENERATED{$name} = 1;
@@ -140,7 +140,10 @@ sub _generate {
         die "Unable to import API $name from $library: $^E"
           unless defined $api;
 
-        return $api->Call(@_);
+        $call = sub { return $api->Call(@_) }
+          unless ( 'CODE' eq ref $call );
+
+        return $call->(@_);
     };
 }
 

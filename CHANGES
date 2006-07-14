@@ -1,6 +1,9 @@
 Revision history for Perl extension Win32::API::Interface
 
-0.0001_03 Thu Jul 07 00:49:01 2006
+0.0001_04 Thu Jul 07 02:09:11 2006
+    - internal experiment
+
+0.0001_03 Thu Jul 12 01:49:01 2006
     - internal changes
     - function generated added
 
