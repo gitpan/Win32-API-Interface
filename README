@@ -1,5 +1,5 @@
 NAME
-      Win32::API::Interface - Object oriented interface generation
+    Win32::API::Interface - Object oriented interface generation
 
 SYNOPSIS
         package MyModule;
@@ -25,6 +25,14 @@ METHODS
     Win32::API::Interface provides a basic constructor. It generates a
     hash-based object and can be called as either a class method or an
     object method.
+
+  self
+        my $self = $obj->self;
+
+    Returns itself. Acutally useless and mainly used internally. Can also be
+    called as a object method.
+
+        Win32::API::Interface->self
 
   generate
         __PACKAGE__->generate( "kernel32", "GetCurrentProcessId", "", "N" );

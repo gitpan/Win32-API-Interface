@@ -2,12 +2,13 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
+          'PL_FILES' => {},
+          'INSTALLDIRS' => 'site',
           'NAME' => 'Win32::API::Interface',
+          'EXE_FILES' => [],
           'VERSION_FROM' => 'lib/Win32/API/Interface.pm',
           'PREREQ_PM' => {
                            'Win32::API' => '0.41'
-                         },
-          'INSTALLDIRS' => 'site',
-          'PL_FILES' => {}
+                         }
         )
 ;

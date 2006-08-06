@@ -3,14 +3,14 @@ package Win32::API::Interface;
 use strict;
 
 use vars qw/$VERSION $INSTANCE %API_GENERATED/;
-$VERSION  = '0.01';
+$VERSION  = '0.02';
 $INSTANCE = Win32::API::Interface->new;
 
 use Win32::API ();
 
 =head1 NAME
 
-  Win32::API::Interface - Object oriented interface generation
+Win32::API::Interface - Object oriented interface generation
 
 =head1 SYNOPSIS
 
@@ -49,6 +49,17 @@ sub new {
 
     return bless {}, $class;
 }
+
+=head2 self
+
+    my $self = $obj->self;
+
+Returns itself. Acutally useless and mainly used internally.
+Can also be called as a object method.
+
+    Win32::API::Interface->self
+
+=cut
 
 sub self {
     my $self = shift;
@@ -141,24 +152,24 @@ sub _generate {
           unless defined $api;
 
         $call = sub { return shift->Call(@_) }
-          unless ( 'CODE' eq ref $call );
+          unless 'CODE' eq ref $call;
 
         return $call->($api, @_);
     };
 }
 
-sub generate_ex {
-    my $self = shift;
-    my %args = 'HASH' eq ref $_[0] ? %{ $_[0] } : @_;
-
-    while ( my ( $library, $params ) = each %args ) {
-        foreach my $args ( @{$params} ) {
-            $self->generate( $library, @{$args} );
-        }
-    }
-
-    return 1;
-}
+#sub generate_ex {
+#    my $self = shift;
+#    my %args = 'HASH' eq ref $_[0] ? %{ $_[0] } : @_;
+#
+#    while ( my ( $library, $params ) = each %args ) {
+#        foreach my $args ( @{$params} ) {
+#            $self->generate( $library, @{$args} );
+#        }
+#    }
+#
+#    return 1;
+#}
 
 =head2 generated
 
