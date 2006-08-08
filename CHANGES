@@ -1,5 +1,13 @@
 Revision history for Perl extension Win32::API::Interface
 
+0.03      Wed Aug 09 02:53:11 2006
+    - introducing code references as last parameter of generate
+    - POD changes
+
+0.02      Sun Aug 06 14:03:20 2006
+    - POD changes
+    - internal changes
+
 0.01      Fri Jul 14 12:15:00 2006
     - first release
 

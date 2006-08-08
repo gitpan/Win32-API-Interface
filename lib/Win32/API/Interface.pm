@@ -3,7 +3,7 @@ package Win32::API::Interface;
 use strict;
 
 use vars qw/$VERSION $INSTANCE %API_GENERATED/;
-$VERSION  = '0.02';
+$VERSION  = '0.03';
 $INSTANCE = Win32::API::Interface->new;
 
 use Win32::API ();
@@ -80,21 +80,38 @@ of type I<long>.
 Actually the same as above, but this will generate a method called I<get_pid>.
 This is useful if you do not want to rely on the API function name.
 
-    __PACKAGE__->generate(
-        [ "kernel32", "GetTempPath", "NP", "N" ],
-        [ "kernel32", "GetCurrentProcessId", "", "N", "get_pid" ],
+    __PACKAGE__->generare(
+        "advapi32",
+        "EncryptFile",
+        "P", "I", "",
+        sub {
+            my ( $self, $filename ) = @_;
+            return $self->Call( File::Spec->canonpath($filename) );
+        }
     );
 
-You may call I<generate> passing an array of array references.
+As the seventh and last parameter you may provide a function reference for modifying
+the input to and output from the API function.
+
+    __PACKAGE__->generate(
+        [ "kernel32", "GetTempPath",         "NP", "N" ],
+        [ "kernel32", "GetCurrentProcessId", "",   "N", "get_pid" ],
+        [ "advapi32" ,"EncryptFile",         "P",  "I", "",       $coderef ],
+    );
+
+You may call I<generate> passing an hash reference of array references.
 
     __PACKAGE__->generate( {
         "kernel32" => [
-            [ "GetTempPath", "NP", "N" ],
-            [ "GetCurrentProcessId", "", "N", "get_pid" ],
+            [ "GetTempPath",         "NP", "N" ],
+            [ "GetCurrentProcessId", "",   "N", "get_pid" ],
         ],
         "user32" => [
-            [ "GetCursorPos", "P", "I"]
+            [ "GetCursorPos",        "P",  "I"]
         ],
+        "advapi32" => [
+            [ "EncryptFile",         "P",  "I", "",       $coderef ],
+        ].
     } );
 
 =cut
@@ -151,10 +168,14 @@ sub _generate {
         die "Unable to import API $name from $library: $^E"
           unless defined $api;
 
-        $call = sub { return shift->Call(@_) }
-          unless 'CODE' eq ref $call;
 
-        return $call->($api, @_);
+        my $retval;
+        if( 'CODE' eq ref $call ) {
+            $retval = $call->($api, @_);
+        } else {
+            $retval = $api->Call(@_);
+        }
+        return $retval;
     };
 }
 
